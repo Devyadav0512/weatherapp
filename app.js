@@ -10,29 +10,35 @@ app.set("view engine", "ejs");
 var weather;
 var location;
 var coordinate;
+var temperature;
+var image;
 
 app.get("/", function(req, res) {
-	res.render("home", {location: location});
+	res.render("home", {location: location, weather: weather, temperature: temperature, image: image});
 });
 
-app.post("/loc", function(req, res) {
+app.post("/loc", async function(req, res) {
     location = req.body.location;
-    request('https://www.metaweather.com/api/location/search/?query='+location, function (error, response, body) {
-      if(error){
-        console.log(error);
+    await request('https://www.metaweather.com/api/location/search/?query='+location, function (err, res) {
+      if(err){
+        console.log(err);
       } else{
-        coordinate = JSON.parse(body)[0].woeid;
+        coordinate = JSON.parse(res.body)[0].woeid;
         console.log(coordinate);
+        request('https://www.metaweather.com/api/location/'+coordinate+'/', function (err, res) {
+          if(err){
+            console.log(err);
+          } else{
+            weather = JSON.parse(res.body).consolidated_weather[1].weather_state_name;
+            temperature = JSON.parse(res.body).consolidated_weather[1].the_temp;
+            image = "/static/img/weather/png/64/"+JSON.parse(res.body).consolidated_weather[1].weather_state_abbr+".png";
+            console.log(weather);
+            console.log(temperature);
+            console.log(image);            
+          }
+        });        
       }
-    });
-    request('https://www.metaweather.com/api/location/'+coordinate+'/', function (error, response, body) {
-      if(error){
-        console.log(error);
-      } else{
-        weather = JSON.parse(body).consolidated_weather[1].weather_state_name;
-        console.log(weather);
-      }
-    });
+    });    
 	res.redirect("/");
 })
 
