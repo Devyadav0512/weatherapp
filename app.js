@@ -31,12 +31,12 @@ app.post("/loc", async function(req, res) {
           } else{
             weather = JSON.parse(res.body).consolidated_weather[1].weather_state_name;
             temperature = JSON.parse(res.body).consolidated_weather[1].the_temp;
-            image = "/static/img/weather/png/64/"+JSON.parse(res.body).consolidated_weather[1].weather_state_abbr+".png";
+            image = "https://www.metaweather.com/static/img/weather/png/64/"+JSON.parse(res.body).consolidated_weather[1].weather_state_abbr+".png";
             console.log(weather);
             console.log(temperature);
             console.log(image);            
           }
-        });        
+        });       
       }
     });    
 	res.redirect("/");
